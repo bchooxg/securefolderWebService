@@ -5,8 +5,8 @@ const port = process.env.PORT || 3001;
 
 // set up postgress
 const { Pool } = require('pg');
-// const DATABASE_URL = process.env.DATABASE_URL;
-const DATABASE_URL = "postgres://secure_folder_user:U29P5psidum1bixHjbDGvmJsABiuEXAo@dpg-ceaom8la4996mec777rg-a.singapore-postgres.render.com/secure_folder?sslmode=require"
+const DATABASE_URL = process.env.DATABASE_URL;
+
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname,'public', "index.html"));
