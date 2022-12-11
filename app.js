@@ -1,8 +1,59 @@
 const express = require("express");
+const path = require("path")
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.get("/", (req, res) => res.type('html').send(html));
+// set up postgress
+const { Pool } = require('pg');
+// const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL = "postgres://secure_folder_user:U29P5psidum1bixHjbDGvmJsABiuEXAo@dpg-ceaom8la4996mec777rg-a.singapore-postgres.render.com/secure_folder?sslmode=require"
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname,'public', "index.html"));
+});
+
+app.get("/api/users", (req, res) => {
+
+    // Check postgres for the username
+    const pool = new Pool({
+      connectionString: DATABASE_URL,
+    })
+
+    pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
+      if (error) {
+        console.log(error)
+      }
+      console.log(results)
+      res.status(200).json(results.rows)
+    })
+})
+
+app.get("/api/user/:username", (req, res) => {
+
+  // Sanitize the input
+  let username = req.params.username.replace(/[^a-zA-Z0-9]/g, "");
+  // remove sql injection commands
+  username = req.params.username.replace(/(select|drop|delete|update|insert|where|from|limit|order|by|group|having|truncate|alter|grant|create|desc|asc|union|into|load_file|outfile)/gi, "");
+
+  if(username.length == 0) {
+    res.status(400).send("Invalid username");
+    return;
+  }
+
+  // Check postgres for the username
+  const pool = new Pool({
+    // connectionString: process.env.DATABASE_URL,
+    connectionString: DATABASE_URL,
+  })
+
+  pool.query(`SELECT * FROM users where username='${username}'`, (error, results) => {
+    if (error) {
+      throw error
+    }
+    res.status(200).json(results.rows)
+  })
+
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
