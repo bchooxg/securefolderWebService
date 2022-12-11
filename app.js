@@ -2,15 +2,28 @@ const express = require("express");
 const path = require("path")
 const app = express();
 const port = process.env.PORT || 3001;
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const cookieJWTAuth = require("./middleware/cookieJWTAuth");
+let dotenv = require('dotenv').config('process.env')
+
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 // set up postgress
 const { Pool } = require('pg');
+const { cookieJwtAuth } = require("./middleware/cookieJWTAuth");
 const DATABASE_URL = process.env.DATABASE_URL;
 
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname,'public', "index.html"));
 });
+app.get("/home",cookieJwtAuth, (req, res) => {
+  res.sendFile(path.join(__dirname,'public', "home.html"));
+})
 
 app.get("/api/users", (req, res) => {
 
@@ -55,56 +68,63 @@ app.get("/api/user/:username", (req, res) => {
 
 });
 
+app.post("/add", (req, res) => {
+  const { username, password } = req.body;
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  })
+
+  pool.query(`INSERT INTO users (username, password, usergroup) VALUES ('${username}', '${password}', 'user')`, (error, results) => {
+    if (error) {
+      console.log(error)
+    }
+    console.log(results)
+  })
+
+  console.log("Adding")
+
+
+  return res.redirect("/home")
+})
+
+app.post('/login', (req, res) => {
+  // check for user in database
+  // if user exists, create a token and send it back to the user
+  // if user does not exist, send back an error
+  const username = req.body.username;
+  const password = req.body.password;
+
+  // Check postgres for the username
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  })
+
+  let user;
+  pool.query(`SELECT * FROM users where username='${username}'`, (error, results) => {
+    if (error) {
+      console.log(error)
+    }
+    console.log("Results:")
+    console.log(results.rows[0])
+    user = results.rows[0];
+    console.log("User:", user)
+    if(user) {
+      if(user.password == password) {
+        // Create a token
+        console.log("User Authenticated, creating token")
+        const token = jwt.sign(user, process.env.MY_SECRET, { expiresIn: "1h" });
+        res.cookie("token", token);
+        return res.redirect("/home")
+      }else{
+        res.status(401).send("Password is incorrect");
+      }
+    }else{
+      res.status(401).send("User does not exist");
+    }
+  })
+
+
+})
+
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
-
-const html = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Hello from Render!</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          disableForReducedMotion: true
-        });
-      }, 500);
-    </script>
-    <style>
-      @import url("https://p.typekit.net/p.css?s=1&k=vnd5zic&ht=tk&f=39475.39476.39477.39478.39479.39480.39481.39482&a=18673890&app=typekit&e=css");
-      @font-face {
-        font-family: "neo-sans";
-        src: url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
-        font-style: normal;
-        font-weight: 700;
-      }
-      html {
-        font-family: neo-sans;
-        font-weight: 700;
-        font-size: calc(62rem / 16);
-      }
-      body {
-        background: white;
-      }
-      section {
-        border-radius: 1em;
-        padding: 1em;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-  </head>
-  <body>
-    <section>
-      Hello from Render!
-    </section>
-  </body>
-</html>
-`
