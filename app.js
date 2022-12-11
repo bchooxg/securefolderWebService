@@ -93,6 +93,8 @@ app.post('/login', (req, res) => {
   // if user does not exist, send back an error
   const username = req.body.username;
   const password = req.body.password;
+  // Check if the user is logging in from the app
+  const fromApp = req.body.fromApp;
 
   // Check postgres for the username
   const pool = new Pool({
@@ -110,6 +112,9 @@ app.post('/login', (req, res) => {
     console.log("User:", user)
     if(user) {
       if(user.password == password) {
+        if(fromApp) {
+          return res.status(200).json(user);
+        }
         // Create a token
         console.log("User Authenticated, creating token")
         const token = jwt.sign(user, process.env.MY_SECRET, { expiresIn: "1h" });
