@@ -1,38 +1,15 @@
-Minimal Flask App
-=================
+# README
 
-Basic template to develop an API with Flask, Flask-RESTful and
-Flask-RESTful-Swagger
+This is the [Express](https://expressjs.com) [Hello world](https://expressjs.com/en/starter/hello-world.html) example on [Render](https://render.com).
 
-Usage
------
+The app in this repo is deployed at [https://express.onrender.com](https://express.onrender.com).
 
-Clone the repo:
+## Deployment
 
-    git clone https://github.com/bonzanini/flask-api-template
-    cd flask-api-template
+See https://render.com/docs/deploy-node-express-app or follow the steps below:
 
-Create virtualenv:
+Create a new web service with the following values:
+  * Build Command: `yarn`
+  * Start Command: `node app.js`
 
-    virtualenv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-    python setup.py develop # or install if you prefer
-
-Run the sample server
-
-    python runserver.py
-
-Try the endpoints:
-
-    curl -XGET http://localhost:5000/dummy
-    curl -XPOST -H "Content-Type: application/json" http://localhost:5000/hello -d '{"name": "World"}'
-
-Swagger docs available at `http://localhost:5000/api/spec.html`
-
-
-License
--------
-
-MIT, see LICENSE file
-
+That's it! Your web service will be live on your Render URL as soon as the build finishes.
