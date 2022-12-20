@@ -108,7 +108,7 @@ app.post("/login", (req, res) => {
 
   let user;
   pool.query(
-    `SELECT id, username, usergroup , min_pass, require_biometrics, require_encryption, company_id, pin_type, pin_max_tries
+    `SELECT id, username, usergroup , min_pass, require_biometrics, require_encryption, company_id, pin_type, pin_max_tries, pin_lockout_time
               FROM users
               JOIN usergroups ON users.usergroup = usergroups.group_name
               where username='${username}' and password = '${password}' `,
