@@ -109,9 +109,9 @@ app.post("/login", (req, res) => {
   let user;
   pool.query(
     `SELECT id, username, usergroup , min_pass, require_biometrics, require_encryption, company_id, pin_type, pin_max_tries, pin_lockout_time
-              FROM users
-              JOIN usergroups ON users.usergroup = usergroups.group_name
-              where username='${username}' and password = '${password}' `,
+      FROM users
+      JOIN usergroups ON users.usergroup = usergroups.group_name
+      where username='${username}' and password = '${password}' `,
     (error, results) => {
       if (error) {
         console.log(error);
@@ -137,5 +137,65 @@ app.post("/login", (req, res) => {
     }
   );
 });
+
+
+app.get("/api/lockOrUnlockUser", (req, res) => {
+  // check for user in database
+
+  console.log("Check user lock status");
+  const username = req.query.username;
+  console.log("Username:", username);
+
+  if (!username ) {
+    return res.status(400).send("Invalid request");
+  }
+
+  // check if user exists
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  });
+  pool.query(`SELECT is_locked from users WHERE username = $1`, [username], (error, results) => {
+    if (error) {
+      console.log(error);
+      return res.status(500).send("Error getting user");
+    }
+    console.log("Results:", results);
+    return res.status(200).send(results.rows[0]);
+  });
+});
+
+app.post("/api/lockOrUnlockUser", (req, res) => {
+  // check for user in database
+  // if user exists, create a token and send it back to the user
+  // if user does not exist, send back an error
+  console.log("Lock user request");
+  const username = req.body.username;
+  const isLocked = req.body.isLocked;
+  console.log("Username:", username);
+  console.log("isLocked:", isLocked);
+
+  if (!username || !isLocked) {
+    return res.status(400).send("Invalid request");
+  }
+
+  // check if user exists
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  });
+  pool.query(`UPDATE users SET is_locked = $1 where username = $2`, [isLocked ,username], (error, results) => {
+    if (error) {
+      console.log(error);
+      return res.status(500).send("Error locking user");
+    }
+    console.log("Results:");
+    console.log(results);
+    if (results.affectedRows == 0) {
+      return res.status(404).send("User not found");
+    }
+    console.log(results)
+    return res.status(200).json("Action Completed");
+  })
+
+})
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
