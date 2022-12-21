@@ -193,7 +193,7 @@ app.post("/api/lockOrUnlockUser", (req, res) => {
       return res.status(404).send("User not found");
     }
     console.log(results)
-    return res.status(200).json("Action Completed");
+    return res.status(200).json({"message":"ok"});
   })
 
 })
