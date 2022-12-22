@@ -187,12 +187,10 @@ app.post("/api/lockOrUnlockUser", (req, res) => {
       console.log(error);
       return res.status(500).send("Error locking user");
     }
-    console.log("Results:");
-    console.log(results);
     if (results.affectedRows == 0) {
       return res.status(404).send("User not found");
     }
-    console.log(results)
+    console.log(`${isLocked? 'Lock':'Unlock'} Action Completed for user ${username} `)
     return res.status(200).json({"message":"ok"});
   })
 
