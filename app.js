@@ -116,8 +116,7 @@ app.post("/login", (req, res) => {
       if (error) {
         console.log(error);
       }
-      console.log("Results:");
-      console.log(results.rows[0]);
+      console.log("User Found in Database")
       user = results.rows[0];
       console.log("User:", user);
       if (user) {
