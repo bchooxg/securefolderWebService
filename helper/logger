@@ -1,0 +1,30 @@
+
+const { Pool } = require("pg");
+const DATABASE_URL = process.env.DATABASE_URL;
+
+// Helper function to log user actions
+
+async function logAction(action, username) {
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  });
+
+  // generate timestamp with timezone
+  const timestamp = new Date().toISOString();
+
+  if (action === "login") {
+    pool.query(
+      `INSERT INTO user_action_log (username, timestamp, action) VALUES ($1, $2, $3)`,[username, timestamp, action],
+      (error, results) => {
+        if (error) {
+          console.log(error);
+        }
+        console.log("Inserted into user_action_log");
+      }
+    );
+  }
+
+
+}
+
+module.exports = { logAction };
