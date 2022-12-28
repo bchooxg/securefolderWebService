@@ -11,6 +11,7 @@ async function logAction(action, username) {
 
   // generate timestamp with timezone
   const timestamp = new Date().toISOString();
+  console.log("Timestamp:", timestamp)
 
   if (action === "login") {
     pool.query(
