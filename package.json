@@ -11,10 +11,11 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "express": "^4.16.3",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "nodemon": "^2.0.20",
     "passport": "^0.6.0",
     "pg": "^8.8.0"

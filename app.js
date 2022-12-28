@@ -3,6 +3,7 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 3001;
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const cookieJWTAuth = require("./middleware/cookieJWTAuth");
 let dotenv = require("dotenv").config("process.env");
@@ -69,14 +70,15 @@ app.get("/api/user/:username", (req, res) => {
   );
 });
 
-app.post("/add", (req, res) => {
+app.post("/add", async (req, res) => {
   const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
   const pool = new Pool({
     connectionString: DATABASE_URL,
   });
 
   pool.query(
-    `INSERT INTO users (username, password, usergroup) VALUES ('${username}', '${password}', 'user')`,
+    `INSERT INTO users (username, password, usergroup) VALUES ('${username}', '${hashedPassword}', 'default')`,
     (error, results) => {
       if (error) {
         console.log(error);
@@ -108,18 +110,22 @@ app.post("/login", (req, res) => {
 
   let user;
   pool.query(
-    `SELECT id, username, usergroup , min_pass, require_biometrics, require_encryption, company_id, pin_type, pin_max_tries, pin_lockout_time
+    `SELECT id, username, password, usergroup , min_pass, require_biometrics, require_encryption, company_id, pin_type, pin_max_tries, pin_lockout_time
       FROM users
       JOIN usergroups ON users.usergroup = usergroups.group_name
-      where username='${username}' and password = '${password}' `,
-    (error, results) => {
+      where username='${username}'`,
+    async (error, results) => {
       if (error) {
         console.log(error);
       }
       console.log("User Found in Database")
       user = results.rows[0];
       console.log("User:", user);
-      if (user) {
+
+      // Check if the password is correct
+      if (user && await bcrypt.compare(password, user.password)) {
+        delete user.password;
+        console.log("Password Correct for user");
         if (fromApp) {
           return res.status(200).json(user);
         }
