@@ -89,17 +89,23 @@ app.post("/add", async (req, res) => {
     `SELECT * FROM users where username = $1`,
     [username],
     (error, results) => {
+
       if (error) {
         console.log(error);
       }
+
       console.log(results);
+
       if (results.rows.length > 0) {
+
         console.log("User Found in Database");
         return res.status(400).send("User already exists");
+
       } else {
+
         console.log("User not found in database");
         pool.query(
-          `INSERT INTO users (username, password, usergroup) VALUES ('${username}', '${hashedPassword}', 'default')`,
+          `INSERT INTO users (username, password, usergroup) VALUES ($1, $2, 'default')`, [username, hashedPassword],
           (error, results) => {
             if (error) {
               console.log(error);
@@ -116,6 +122,29 @@ app.post("/add", async (req, res) => {
 
 
 });
+
+async function logAction(action, username) {
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  });
+
+  // generate timestamp with timezone
+  const timestamp = new Date().toISOString();
+
+  if (action === "login") {
+    pool.query(
+      `INSERT INTO user_action_log (username, timestamp, action) VALUES ($1, $2, $3)`,[username, timestamp, action],
+      (error, results) => {
+        if (error) {
+          console.log(error);
+        }
+        console.log("Inserted into user_action_log");
+      }
+    );
+  }
+
+
+}
 
 app.post("/login", (req, res) => {
   // check for user in database
@@ -138,7 +167,7 @@ app.post("/login", (req, res) => {
     `SELECT id, username, password, usergroup , min_pass, require_biometrics, require_encryption, company_id, pin_type, pin_max_tries, pin_lockout_time
       FROM users
       JOIN usergroups ON users.usergroup = usergroups.group_name
-      where username='${username}'`,
+      where username = $1 `, [username],
     async (error, results) => {
       if (error) {
         console.log(error);
@@ -149,6 +178,9 @@ app.post("/login", (req, res) => {
 
       // Check if the password is correct
       if (user && (await bcrypt.compare(password, user.password))) {
+
+        logAction("login", username);
+
         delete user.password;
         console.log("Password Correct for user ", user.username);
         if (fromApp) {
