@@ -72,24 +72,49 @@ app.get("/api/user/:username", (req, res) => {
 
 app.post("/add", async (req, res) => {
   const { username, password } = req.body;
+  console.log("Received values for ADD Route Username:", username);
+
+  // Check that correct values are passed
+  if (!username || !password) {
+    return res.status(400).send("Invalid username or password");
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   const pool = new Pool({
     connectionString: DATABASE_URL,
   });
 
-  pool.query(
-    `INSERT INTO users (username, password, usergroup) VALUES ('${username}', '${hashedPassword}', 'default')`,
+  // Check if the user already exists
+  await pool.query(
+    `SELECT * FROM users where username = $1`,
+    [username],
     (error, results) => {
       if (error) {
         console.log(error);
       }
       console.log(results);
+      if (results.rows.length > 0) {
+        console.log("User Found in Database");
+        return res.status(400).send("User already exists");
+      } else {
+        console.log("User not found in database");
+        pool.query(
+          `INSERT INTO users (username, password, usergroup) VALUES ('${username}', '${hashedPassword}', 'default')`,
+          (error, results) => {
+            if (error) {
+              console.log(error);
+            }
+            console.log(results);
+          }
+        );
+        console.log("Adding");
+
+        return res.redirect("/home");
+      }
     }
   );
 
-  console.log("Adding");
 
-  return res.redirect("/home");
 });
 
 app.post("/login", (req, res) => {
@@ -118,14 +143,14 @@ app.post("/login", (req, res) => {
       if (error) {
         console.log(error);
       }
-      console.log("User Found in Database")
+      console.log("User Found in Database");
       user = results.rows[0];
       console.log("User:", user);
 
       // Check if the password is correct
-      if (user && await bcrypt.compare(password, user.password)) {
+      if (user && (await bcrypt.compare(password, user.password))) {
         delete user.password;
-        console.log("Password Correct for user");
+        console.log("Password Correct for user ", user.username);
         if (fromApp) {
           return res.status(200).json(user);
         }
@@ -143,7 +168,6 @@ app.post("/login", (req, res) => {
   );
 });
 
-
 app.get("/api/lockOrUnlockUser", (req, res) => {
   // check for user in database
 
@@ -151,7 +175,7 @@ app.get("/api/lockOrUnlockUser", (req, res) => {
   const username = req.query.username;
   console.log("Username:", username);
 
-  if (!username ) {
+  if (!username) {
     return res.status(400).send("Invalid request");
   }
 
@@ -159,14 +183,18 @@ app.get("/api/lockOrUnlockUser", (req, res) => {
   const pool = new Pool({
     connectionString: DATABASE_URL,
   });
-  pool.query(`SELECT is_locked from users WHERE username = $1`, [username], (error, results) => {
-    if (error) {
-      console.log(error);
-      return res.status(500).send("Error getting user");
+  pool.query(
+    `SELECT is_locked from users WHERE username = $1`,
+    [username],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).send("Error getting user");
+      }
+      console.log("Results:", results);
+      return res.status(200).send(results.rows[0]);
     }
-    console.log("Results:", results);
-    return res.status(200).send(results.rows[0]);
-  });
+  );
 });
 
 app.post("/api/lockOrUnlockUser", (req, res) => {
@@ -187,18 +215,23 @@ app.post("/api/lockOrUnlockUser", (req, res) => {
   const pool = new Pool({
     connectionString: DATABASE_URL,
   });
-  pool.query(`UPDATE users SET is_locked = $1 where username = $2`, [isLocked ,username], (error, results) => {
-    if (error) {
-      console.log(error);
-      return res.status(500).send("Error locking user");
+  pool.query(
+    `UPDATE users SET is_locked = $1 where username = $2`,
+    [isLocked, username],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).send("Error locking user");
+      }
+      if (results.affectedRows == 0) {
+        return res.status(404).send("User not found");
+      }
+      console.log(
+        `${isLocked ? "Lock" : "Unlock"} Action Completed for user ${username} `
+      );
+      return res.status(200).json({ message: "ok" });
     }
-    if (results.affectedRows == 0) {
-      return res.status(404).send("User not found");
-    }
-    console.log(`${isLocked? 'Lock':'Unlock'} Action Completed for user ${username} `)
-    return res.status(200).json({"message":"ok"});
-  })
-
-})
+  );
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
