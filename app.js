@@ -12,6 +12,7 @@ let dotenv = require("dotenv").config("process.env");
 const usersRouter = require("./routes/users");
 const lockOrUnlockUserRouter = require("./routes/lockOrUnlockUser");
 const loginRouter = require("./routes/login");
+const addLogRouter = require("./routes/addLog");
 
 app.use(cookieParser());
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/users", usersRouter);
 app.use("/api/lockOrUnlockUser", lockOrUnlockUserRouter);
 app.use("/api/login", loginRouter);
+app.use("/api/addLog", addLogRouter);
 
 // set up postgress
 const { Pool } = require("pg");
