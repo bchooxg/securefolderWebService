@@ -41,13 +41,13 @@ router.post("/", (req, res) => {
             // Check if the password is correct
             if (user && (await bcrypt.compare(password, user.password))) {
 
-                logAction("login", username);
 
                 delete user.password;
                 console.log("Password Correct for user ", user.username);
                 if (fromApp) {
                     return res.status(200).json(user);
                 }
+                logAction("login", username);
                 // Create a token
                 console.log("User Authenticated, creating token");
                 const token = jwt.sign(user, process.env.MY_SECRET, {
