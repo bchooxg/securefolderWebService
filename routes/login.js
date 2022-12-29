@@ -47,7 +47,7 @@ router.post("/", (req, res) => {
                 if (fromApp) {
                     return res.status(200).json(user);
                 }
-                logAction("login", username);
+                logAction("Login", username);
                 // Create a token
                 console.log("User Authenticated, creating token");
                 const token = jwt.sign(user, process.env.MY_SECRET, {
