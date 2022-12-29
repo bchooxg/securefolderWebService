@@ -33,7 +33,7 @@ router.post("/", (req, res) => {
       }
     );
   }
-  return res.status(200).send({result: "ok"});
+  return res.status(200).send({message: "ok"});
 
 
 });
