@@ -23,8 +23,8 @@ router.post("/", (req, res) => {
 
   for (let i = 0; i < log.length; i++) {
     pool.query(
-      `INSERT INTO user_action_log (username, timestamp, action, filename) VALUES ($1, $2, $3, $4)`,
-      [log[i].username, log[i].timestamp, log[i].action, log[i].fileName],
+      `INSERT INTO user_action_log (username, timestamp, action, filename, remarks) VALUES ($1, $2, $3, $4, $5)`,
+      [log[i].username, log[i].timestamp, log[i].action, log[i].fileName, log[i].remarks],
       (error, results) => {
         if (error) {
           console.log(error);
