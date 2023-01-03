@@ -21,6 +21,8 @@ app.use("/api/users", usersRouter);
 app.use("/api/lockOrUnlockUser", lockOrUnlockUserRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/addLog", addLogRouter);
+// Setting public folder as static
+app.use(express.static(path.join(__dirname, "public")))
 
 // set up postgress
 const { Pool } = require("pg");
