@@ -1,0 +1,8 @@
+<h1 class="mt-4">Admin Dashboard</h1>
+
+<p>Hello <%= user.first_name %> </p>
+<form method="post" action="/api/users/add">
+  <input placeholder="username" type="text" name="username">
+  <input placeholder="password" type="text" name="password">
+  <button>Add</button>
+</form>
