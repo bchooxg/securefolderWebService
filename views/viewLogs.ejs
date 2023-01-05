@@ -1,0 +1,43 @@
+<h1 class="mt-4">View Logs</h1>
+
+<%
+  if (logs.length > 0) {
+    %>
+    <table id="logsTable" class="display">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Action</th>
+          <th>File Name</th>
+          <th>Timestamp</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% logs.forEach(function(log) { %>
+        <tr>
+          <td><%= log.username %></td>
+          <td><%= log.action %></td>
+          <td><%= log.filename %></td>
+          <td><%= log.timestamp %></td>
+          <td><%= log.remarks %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <%
+  } else {
+    %>
+    <p>No logs found</p>
+    <%} %>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<link href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+<script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+
+<script>
+  $(document).ready(function() {
+    $('#logsTable').DataTable();
+  });
+</script>

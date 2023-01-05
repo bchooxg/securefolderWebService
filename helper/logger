@@ -13,9 +13,9 @@ async function logAction(action, username) {
   const timestamp = new Date().toISOString();
   console.log("Timestamp:", timestamp)
 
-  if (action === "login") {
+  if (action === "Login" || action === "Logout") {
     pool.query(
-      `INSERT INTO user_action_log (username, timestamp, action) VALUES ($1, $2, $3)`,[username, timestamp, action],
+      `INSERT INTO user_action_log (username, timestamp, action, remarks) VALUES ($1, $2, $3, $4)`,[username, timestamp, action, "Web App"],
       (error, results) => {
         if (error) {
           console.log(error);

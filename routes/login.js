@@ -26,7 +26,7 @@ router.post("/", (req, res) => {
 
     let user;
     pool.query(
-        `SELECT id, username, password, usergroup , min_pass, require_biometrics, require_encryption, company_id, pin_type, pin_max_tries, pin_lockout_time, first_name, last_name
+        `SELECT id, username, password, usergroup , min_pass, require_biometrics, require_encryption, users.company_id, pin_type, pin_max_tries, pin_lockout_time, first_name, last_name
       FROM users
       JOIN usergroups ON users.usergroup = usergroups.group_name
       where username = $1 `, [username],
@@ -34,6 +34,12 @@ router.post("/", (req, res) => {
             if (error) {
                 console.log(error);
             }
+
+            if(!results){
+                console.log("User Not Found in Database");
+                return res.status(401).send("Invalid Credentials");
+            }
+
             console.log("User Found in Database");
             user = results.rows[0];
             console.log("User:", user);

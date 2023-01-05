@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const {Pool} = require("pg");
 const bcrypt = require("bcrypt");
 const router = express.Router();
@@ -54,7 +55,12 @@ router.get("/:username", (req, res) => {
 
 // Function to add a new user
 router.post("/add", async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, first_name, last_name } = req.body;
+
+    let token = req.cookies.token;
+    let user = jwt.verify(token, process.env.MY_SECRET);
+    const company_id = user.company_id;
+
     console.log("Received values for ADD Route Username:", username);
 
     // Check that correct values are passed
@@ -88,7 +94,9 @@ router.post("/add", async (req, res) => {
 
                 console.log("User not found in database");
                 pool.query(
-                    `INSERT INTO users (username, password, usergroup) VALUES ($1, $2, 'default')`, [username, hashedPassword],
+                    `INSERT INTO users (username, password, usergroup, company_id, first_name, last_name)
+                    VALUES ($1, $2, $3, $4, $5, $6)`,
+                    [username, hashedPassword, "default", company_id, first_name, last_name ],
                     (error, results) => {
                         if (error) {
                             console.log(error);

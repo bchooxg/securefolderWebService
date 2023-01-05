@@ -9,11 +9,12 @@ const cookieJWTAuth = require("./middleware/cookieJWTAuth");
 let dotenv = require("dotenv").config("process.env");
 const expressLayouts = require("express-ejs-layouts");
 
-// Get routers
+// Routers
 const usersRouter = require("./routes/users");
 const lockOrUnlockUserRouter = require("./routes/lockOrUnlockUser");
 const loginRouter = require("./routes/login");
 const addLogRouter = require("./routes/addLog");
+const dashboardRouter = require("./routes/dashboard");
 
 // Set templating Engine
 app.use(expressLayouts);
@@ -28,6 +29,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/lockOrUnlockUser", lockOrUnlockUserRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/addLog", addLogRouter);
+app.use("/", dashboardRouter)
 // Setting public folder as static
 app.use(express.static(path.join(__dirname, "public")))
 
@@ -40,22 +42,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.get("/logout", (req, res) => {
-  res.clearCookie("token");
-  res.redirect("/");
-})
-
-app.get("/home", cookieJwtAuth, (req, res) => {
-  let token = req.cookies.token;
-  let user = jwt.verify(token, process.env.MY_SECRET);
-  res.render("home", { title: "Dashboard", user: user });
-});
-
-app.get("/manageUsers", cookieJwtAuth, (req, res) => {
-  let token = req.cookies.token;
-  let user = jwt.verify(token, process.env.MY_SECRET);
-  res.render("manageUsers", { title: "Manage Users", user: user });
-});
 
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

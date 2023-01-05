@@ -1,0 +1,45 @@
+<h1 class="mt-4">Manage Groups </h1>
+
+<%
+  if (groups.length > 0) {
+    %>
+    <table id="groupsTable" class="display">
+      <thead>
+        <tr>
+          <th>Group Name</th>
+          <th>Min Pass</th>
+          <th>Require Biometrics</th>
+          <th>Require Encryption</th>
+          <th>Pin Max Tries</th>
+          <th>Pin Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% groups.forEach(function(group) { %>
+        <tr>
+          <td><%= group.group_name %></td>
+          <td><%= group.min_pass %></td>
+          <td><%= group.require_biometrics %></td>
+          <td><%= group.require_encryption %></td>
+          <td><%= group.pin_max_tries %></td>
+          <td><%= group.pin_type %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <%
+  } else {
+    %>
+    <p>No Groups found</p>
+    <%} %>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<link href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+<script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+
+<script>
+  $(document).ready(function() {
+    $('#groupsTable').DataTable();
+  });
+</script>

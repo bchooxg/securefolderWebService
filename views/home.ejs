@@ -1,8 +1,14 @@
 <h1 class="mt-4">Admin Dashboard</h1>
 
-<p>Hello <%= user.first_name %> </p>
+<p>Total Users : <%= userCnt %></p>
+<p>Total Actions : <%= userAction %></p>
+<p>Total UserGroups : <%= userGroupCnt %></p>
 <form method="post" action="/api/users/add">
-  <input placeholder="username" type="text" name="username">
-  <input placeholder="password" type="text" name="password">
+  <input placeholder="Username" type="text" name="username">
+  <input placeholder="First name" type="text" name="first_name">
+
+  <input placeholder="Last Name" type="text" name="last_name">
+
+  <input placeholder="Password" type="text" name="password">
   <button>Add</button>
 </form>
