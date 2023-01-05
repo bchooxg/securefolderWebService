@@ -55,7 +55,7 @@ router.get("/:username", (req, res) => {
 
 // Function to add a new user
 router.post("/add", async (req, res) => {
-    const { username, password, first_name, last_name } = req.body;
+    const { username, password, first_name, last_name, userGroup } = req.body;
 
     let token = req.cookies.token;
     let user = jwt.verify(token, process.env.MY_SECRET);
@@ -96,7 +96,7 @@ router.post("/add", async (req, res) => {
                 pool.query(
                     `INSERT INTO users (username, password, usergroup, company_id, first_name, last_name)
                     VALUES ($1, $2, $3, $4, $5, $6)`,
-                    [username, hashedPassword, "default", company_id, first_name, last_name ],
+                    [username, hashedPassword, userGroup, company_id, first_name, last_name ],
                     (error, results) => {
                         if (error) {
                             console.log(error);
@@ -111,6 +111,51 @@ router.post("/add", async (req, res) => {
         }
     );
 
+
+});
+
+// function to delete a user
+router.delete("/delete", (req, res) => {
+    const { username } = req.body;
+
+    // verify jwt token
+    let token = req.cookies.token;
+    let user = jwt.verify(token, process.env.MY_SECRET);
+
+    if(user.usergroup != "admin"){
+        return res.status(400).send("You do not have permission to delete users");
+    }
+
+    if(user.username == username){
+        return res.status(400).send("You cannot delete yourself");
+    }
+
+
+    console.log("Received values for DELETE Route Username:", username);
+
+    // Check that correct values are passed
+    if (!username) {
+        return res.status(400).send("Invalid username");
+    }
+
+    const pool = new Pool({
+        connectionString: DATABASE_URL,
+    });
+
+    pool.query(
+        `DELETE FROM users where username = $1`,
+        [username],
+        (error, results) => {
+            if (error) {
+                console.log(error);
+            }
+            console.log(results);
+        }
+    );
+    console.log("Deleting");
+
+    // return code 200 to indicate success
+    return res.status(200).send("User deleted");
 
 });
 

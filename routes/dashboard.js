@@ -21,18 +21,26 @@ router.get("/home", cookieJwtAuth, (req, res) => {
   let userCnt = 0
   let userActionCnt = 0
   let userGroupCnt = 0
+  let company = null
   const company_id = user.company_id;
 
-  Promise.all([userQuery(company_id), userActionQuery(company_id), userGroupQuery(company_id)]).then((results) => {
+  Promise.all([
+    userQuery(company_id),
+    userActionQuery(company_id),
+    userGroupQuery(company_id),
+    companyQuery(company_id)
+  ]).then((results) => {
     userCnt = results[0].length;
     userActionCnt = results[1].length;
     userGroupCnt = results[2].length;
+    company = results[3][0];
     res.render("home", {
       title: "Home",
       user: user,
       userCnt: userCnt,
-      userAction: userActionCnt,
-      userGroupCnt: userGroupCnt});
+      userActionCtn: userActionCnt,
+      userGroupCnt: userGroupCnt,
+      company: company});
   }).catch((error) => {
     console.log(error);
   })
@@ -42,11 +50,16 @@ router.get("/home", cookieJwtAuth, (req, res) => {
 router.get("/manageUsers", cookieJwtAuth, (req, res) => {
   let token = req.cookies.token;
   let user = jwt.verify(token, process.env.MY_SECRET);
-  userQuery(user.company_id).then((results) => {
-    res.render("manageUsers", { title: "Manage Users", user: user, users: results });
+  Promise.all([
+    userQuery(user.company_id),
+    userGroupQuery(user.company_id)
+  ]).then((results) => {
+    res.render("manageUsers", { title: "Manage Users", user: user, users: results[0], userGroups: results[1] });
   }).catch((error) => {
     console.log(error);
-  });
+  })
+
+
 
 });
 
@@ -106,6 +119,20 @@ function userGroupQuery(company_id){
   });
   return new Promise(function (resolve, reject) {
     pool.query("SELECT * FROM usergroups where company_id = $1", [company_id], (error, results) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(results.rows);
+    });
+  })
+}
+
+function companyQuery(company_id){
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  });
+  return new Promise(function (resolve, reject) {
+    pool.query("SELECT * FROM companies where company_id = $1", [company_id], (error, results) => {
       if (error) {
         reject(error);
       }
