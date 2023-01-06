@@ -36,7 +36,7 @@ router.post("/create", (req, res) => {
 router.post("/update", (req, res) => {
   let token = req.cookies.token;
   let user = jwt.verify(token, process.env.MY_SECRET);
-  let { group_name, min_pass, require_biometrics , require_encryption, pin_max_tries, pin_type } = req.body;
+  let { group_name, min_pass, require_biometrics , require_encryption, pin_max_tries, pin_type, is_admin } = req.body;
   console.log(req.body);
   require_biometrics = require_biometrics === "true" ? true : false;
   require_encryption = require_encryption === "true" ? true : false;
