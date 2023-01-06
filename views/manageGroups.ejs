@@ -1,4 +1,14 @@
-<h1 class="mt-4">Manage Groups </h1>
+<div class="row mt-4">
+  <div class="col">
+    <h1 >Manage Groups </h1>
+  </div>
+  <div class="col">
+    <button type="button" class="btn btn-success"
+    onclick="addGroupModal()">
+      Add Group
+    </button>
+  </div>
+</div>
 
 <%
   if (groups.length > 0) {
@@ -12,17 +22,21 @@
           <th>Require Encryption</th>
           <th>Pin Max Tries</th>
           <th>Pin Type</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <% groups.forEach(function(group) { %>
-        <tr>
+        <tr id="<%= group.group_name%>">
           <td><%= group.group_name %></td>
           <td><%= group.min_pass %></td>
           <td><%= group.require_biometrics %></td>
           <td><%= group.require_encryption %></td>
           <td><%= group.pin_max_tries %></td>
           <td><%= group.pin_type %></td>
+          <td>
+            <button class="btn btn-primary" onclick="editGroup('<%= group.group_name%>')">Edit</button>
+          </td>
         </tr>
         <% }); %>
       </tbody>
@@ -33,6 +47,59 @@
     <p>No Groups found</p>
     <%} %>
 
+<!-- Modal to manage users -->
+<div class="modal fade" id="groupModal" tabindex="-1" aria-labelledby="groupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="groupModalLabel">Manage User Group</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="groupForm" action="api/users/add" method="post">
+          <div class="mb-3">
+            <label for="username" class="col-form-label">Group Name:</label>
+            <input name="group_name" type="text" class="form-control" id="username">
+          </div>
+          <div class="mb-3">
+            <label for="username" class="col-form-label">Min Pin Length:</label>
+            <input id="min_pass" name="min_pas" type="text" class="form-control" id="username">
+          </div>
+          <div class="mb-3">
+            <input class="form-check-input" type="checkbox" value="" id="cb_require_biometrics" name="require_biometrics">
+            <label class="form-check-label" for="cb_require_biometrics">
+              Require Biometrics
+            </label>
+          </div>
+          <div class="mb-3">
+            <input class="form-check-input" type="checkbox" value="" id="cb_require_encryption" name="require_encryption">
+            <label class="form-check-label" for="cb_require_encryption">
+              Require Encryption
+            </label>
+          </div>
+          <div class="mb-3">
+            <label for="user-group" class="col-form-label">Pin Max Tries:</label>
+            <input name="pin_max_tries" type="text" class="form-control" id="pin_max_tries">
+          </div>
+          <div class="mb-3">
+            <label for="user-group" class="col-form-label">Pin Type:</label>
+            <select name='pin_type' class="form-select" id="pin_type" aria-label="Default select example">
+              <option value="pin">Numeric</option>
+              <option value="pass">Alpha-Numeric</option>
+            </select>
+
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button form="userForm" type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <link href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
 <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
@@ -42,4 +109,36 @@
   $(document).ready(function() {
     $('#groupsTable').DataTable();
   });
+
+  function addGroupModal() {
+    // Clear the form
+    $('#userForm').trigger("reset");
+    $('#groupModal').modal('show');
+  }
+
+  function editGroup(groupName) {
+    // Clear the form
+    $('#userForm').trigger("reset");
+
+
+
+    // Get the user data from datatable
+    var table = $('#groupsTable').DataTable();
+    var result = table.row("#" + groupName).data()
+    // Set the form values
+    console.log(result)
+    $('#username').val(result[0]);
+    $('#min_pass').val(result[1]);
+    $('#cb_require_biometrics').prop('checked',  result[2] == 'true');
+    $('#cb_require_encryption').prop('checked', result[3] == 'true');
+    $('#pin_max_tries').val(result[4]);
+    $('#pin_type').val(result[5]);
+    // Set the form action
+    $('#userForm').attr('action', '/api/groups/' + groupName);
+    // Show the modal
+    $('#groupModal').modal('show');
+
+
+  }
+
 </script>
