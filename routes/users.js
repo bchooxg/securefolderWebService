@@ -42,7 +42,11 @@ router.get("/:username", (req, res) => {
   });
 
   pool.query(
-    `SELECT * FROM users where username=$1`,[username],
+    `SELECT * FROM users
+    join usergroups
+    on users.company_id = usergroups.company_id
+    and users.usergroup = usergroups.group_name
+    where username=$1 `,[username],
     (error, results) => {
       if (error) {
         throw error;
