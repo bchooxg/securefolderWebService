@@ -15,6 +15,7 @@ const lockOrUnlockUserRouter = require("./routes/lockOrUnlockUser");
 const loginRouter = require("./routes/login");
 const addLogRouter = require("./routes/addLog");
 const dashboardRouter = require("./routes/dashboard");
+const groupsRouter = require("./routes/groups");
 
 // Set templating Engine
 app.use(expressLayouts);
@@ -29,6 +30,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/lockOrUnlockUser", lockOrUnlockUserRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/addLog", addLogRouter);
+app.use("/api/groups", groupsRouter);
 app.use("/", dashboardRouter)
 // Setting public folder as static
 app.use(express.static(path.join(__dirname, "public")))
