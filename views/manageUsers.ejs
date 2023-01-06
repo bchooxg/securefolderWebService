@@ -100,23 +100,23 @@
         <form id="userForm" action="api/users/add" method="post">
           <div class="mb-3">
             <label for="username" class="col-form-label">Username:</label>
-            <input name="username" type="text" class="form-control" id="username">
+            <input required name="username" type="text" class="form-control" id="username">
           </div>
           <div class="mb-3">
             <label for="username" class="col-form-label">Password:</label>
-            <input id="password" name="password" type="password" class="form-control" id="username">
+            <input required id="password" name="password" type="password" class="form-control" id="username">
           </div>
           <div class="mb-3">
             <label for="first-name" class="col-form-label">First Name:</label>
-            <input name="first_name" type="text" class="form-control" id="first-name">
+            <input required name="first_name" type="text" class="form-control" id="first-name">
           </div>
           <div class="mb-3">
             <label for="last-name" class="col-form-label">Last Name:</label>
-            <input name="last_name" type="text" class="form-control" id="last-name">
+            <input required name="last_name" type="text" class="form-control" id="last-name">
           </div>
           <div class="mb-3">
             <label for="user-group" class="col-form-label">User Group:</label>
-            <select name='userGroup' class="form-select" id="user-group" aria-label="Default select example">
+            <select required name='userGroup' class="form-select" id="user-group" aria-label="Default select example">
               <%
                 userGroups.forEach(function(userGroup) {
                   %> <option
@@ -158,6 +158,9 @@
   });
 
   function deleteUser(username) {
+    if(!confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
     $.ajax({
       url: '/api/users/delete',
       type: 'DELETE',
@@ -167,7 +170,6 @@
       success: function(result) {
         // delete row
         $('#usersTable').DataTable().row('#' + username).remove().draw();
-        alert(result);
       },
       error: function(result) {
         alert(result.responseText);
@@ -198,6 +200,7 @@
     $('#userModalLabel').text('Edit User');
     $('#userForm').attr('action', '/api/users/update');
     $('#password').prop('disabled', true)
+    $('#password').prop('required', false)
     $('#username').val(result[0]);
     $('#first-name').val(result[1]);
     $('#last-name').val(result[2]);

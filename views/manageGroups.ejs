@@ -62,11 +62,11 @@
         <form id="groupForm" action="" method="post">
           <div class="mb-3">
             <label for="group_name" class="col-form-label">Group Name:</label>
-            <input name="group_name" type="text" class="form-control" id="group_name">
+            <input required name="group_name" type="text" class="form-control" id="group_name">
           </div>
           <div class="mb-3">
             <label for="min_pass" class="col-form-label">Min Pin Length:</label>
-            <input id="min_pass" name="min_pass" type="text" class="form-control" id="min_pass">
+            <input required id="min_pass" name="min_pass" type="number" class="form-control" id="min_pass">
           </div>
           <div class="mb-3">
             <input class="form-check-input" type="checkbox" value="true" id="cb_require_biometrics" name="require_biometrics">
@@ -88,11 +88,11 @@
           </div>
           <div class="mb-3">
             <label for="pin_max_tries" class="col-form-label">Pin Max Tries:</label>
-            <input name="pin_max_tries" type="text" class="form-control" id="pin_max_tries">
+            <input required name="pin_max_tries" type="number" class="form-control" id="pin_max_tries">
           </div>
           <div class="mb-3">
             <label for="pin_type" class="col-form-label">Pin Type:</label>
-            <select name='pin_type' class="form-select" id="pin_type" aria-label="Default select example">
+            <select required name='pin_type' class="form-select" id="pin_type" aria-label="Default select example">
               <option value="pin">Numeric</option>
               <option value="pass">Alpha-Numeric</option>
             </select>
