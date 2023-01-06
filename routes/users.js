@@ -42,12 +42,12 @@ router.get("/:username", (req, res) => {
   });
 
   pool.query(
-    `SELECT * FROM users where username='${username}'`,
+    `SELECT * FROM users where username=$1`,[username],
     (error, results) => {
       if (error) {
         throw error;
       }
-      res.status(200).json(results.rows);
+      res.status(200).json(results.rows[0]);
     }
   );
 });
