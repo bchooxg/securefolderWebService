@@ -4,13 +4,13 @@ const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const router = express.Router();
 const { logAction } = require("../helper/logger");
-const { incrementFailedLogin } = require("../helper/failedLogin");
+const { incrementFailedLogin, resetLoginAttempts } = require("../helper/failedLogin");
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
 // function to display change password page
 router.get("/changePassword", (req, res) => {
-  console.log("Change Password Page");
+  console.log("Change Password GET request");
   res.render("changePassword", {
     layout: "layouts/basicLayout",
     title: "Change Password",
@@ -18,8 +18,12 @@ router.get("/changePassword", (req, res) => {
 });
 
 router.post("/changePassword", (req, res) => {
-  console.log("Change Password Page");
+  console.log("Change Password POST request");
   const { username, old_password, new_password, new_password_cfm } = req.body;
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  });
+
   pool.query(
     `SELECT * FROM users
      JOIN usergroups ON users.usergroup= usergroups.group_name
@@ -35,10 +39,6 @@ router.post("/changePassword", (req, res) => {
       }
       const user = results.rows[0];
       if (user) {
-        if (user.failed_login_count >= user.pin_max_tries) {
-          res.status(400).send("Account locked");
-          return;
-        }
         if (bcrypt.compareSync(old_password, user.password)) {
           if (new_password == new_password_cfm) {
             bcrypt.hash(new_password, 10, (err, hash) => {
@@ -49,6 +49,7 @@ router.post("/changePassword", (req, res) => {
                   if (error) {
                     throw error;
                   }
+                  resetLoginAttempts(username);
                   res.status(200).send("Password changed");
                 }
               );
@@ -57,7 +58,7 @@ router.post("/changePassword", (req, res) => {
             res.status(400).send("New passwords do not match");
           }
         } else {
-          res.status(400).send("Invalid password");
+          res.status(400).send(`Incorrect password try ${user.failed_login_count + 1} of ${user.pin_max_tries}`);
           incrementFailedLogin(user.username, user.failed_login_count, user.pin_max_tries);
         }
       }

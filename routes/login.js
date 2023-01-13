@@ -68,7 +68,7 @@ router.post("/", (req, res) => {
           return res.redirect("/home");
         } else {
 					incrementFailedLogin(user.username , user.failed_login_count, user.pin_max_tries);
-          return res.status(401).send(`Invalid Password ${user.failed_login_count} of ${user.pin_max_tries} tries`);
+          return res.status(401).send(`Invalid password try  ${user.failed_login_count + 1} of ${user.pin_max_tries} tries`);
         }
       } else {
         res.status(401).send("Invalid Credentials");
