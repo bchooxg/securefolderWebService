@@ -4,26 +4,30 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 // Helper function to log user actions
 
-async function logAction(action, username) {
+async function logAction(action, username, remarks = null) {
   const pool = new Pool({
     connectionString: DATABASE_URL,
   });
 
   // generate timestamp with timezone
   const timestamp = new Date().toISOString();
+  let remarksVal = remarks
   console.log("Timestamp:", timestamp)
 
-  if (action === "Login" || action === "Logout") {
-    pool.query(
-      `INSERT INTO user_action_log (username, timestamp, action, remarks) VALUES ($1, $2, $3, $4)`,[username, timestamp, action, "Web App"],
-      (error, results) => {
-        if (error) {
-          console.log(error);
-        }
-        console.log("Inserted into user_action_log");
-      }
-    );
+  if( action != "Login" || action != "Logout"){
+    remarksVal = "Web App"
   }
+
+
+  pool.query(
+    `INSERT INTO user_action_log (username, timestamp, action, remarks) VALUES ($1, $2, $3, $4)`,[username, timestamp, action, remarks],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+      }
+      console.log("Inserted into user_action_log");
+    }
+  );
 
 
 }

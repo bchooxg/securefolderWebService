@@ -19,6 +19,7 @@
           <th>First Name</th>
           <th>Last Name</th>
           <th>User Group</th>
+          <th>Failed Login Attempt</th>
           <th>Is Locked</th>
           <th>Actions</th>
         </tr>
@@ -30,6 +31,7 @@
           <td><%= user.first_name %></td>
           <td><%= user.last_name %></td>
           <td><%= user.usergroup %></td>
+          <td><%= user.failed_login_count %></td>
           <td id = 'isLocked_<%= user.username%>'>
             <% if(user.is_locked) { %>
               <span class="badge bg-danger">Locked</span>
@@ -182,6 +184,7 @@
     $('#userModalLabel').text('Add User');
     $('#userForm').attr('action', '/api/users/add');
     $('#username').val('');
+    $('#username').prop('disabled', false)
     $('#first-name').val('');
     $('#last-name').val('');
     $('#user-group').val('default');
@@ -202,6 +205,7 @@
     $('#password').prop('disabled', true)
     $('#password').prop('required', false)
     $('#username').val(result[0]);
+    $('#username').prop('disabled', true)
     $('#first-name').val(result[1]);
     $('#last-name').val(result[2]);
     $('#user-group').val(result[3]);
@@ -220,22 +224,23 @@
         // update row in table
         var row = $('#usersTable').DataTable().row('#' + username);
         var data = row.data();
-        let btnArray = data[5].split(`<button`);
+        let btnArray = data[6].split(`<button`);
         btnArray.pop()
         let btnString = btnArray.join(`<button`)
         if(isLocked){
-          data[4] = '<span class="badge bg-danger">Locked</span>';
+          data[5] = '<span class="badge bg-danger">Locked</span>';
           // the last button to unlock
           btnString = btnString += `<button type="button" onclick="lockOrUnlockUser('${username}', false)" class="btn btn-success">
             Unlock User
             </button>`;
-          data[5] = btnString;
+          data[6] = btnString;
         } else {
-          data[4] = '<span class="badge bg-success">Unlocked</span>';
-          data[5] = btnString += `<button type="button" onclick="lockOrUnlockUser('${username}', true)" class="btn btn-warning">
+          data[5] = '<span class="badge bg-success">Unlocked</span>';
+          data[6] = btnString += `<button type="button" onclick="lockOrUnlockUser('${username}', true)" class="btn btn-warning">
             Lock User
             </button>`;
         }
+        data[4] = "0"
         row.data(data).draw();
 
       },

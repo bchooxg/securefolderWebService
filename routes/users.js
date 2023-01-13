@@ -3,8 +3,67 @@ const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const router = express.Router();
+const { logAction } = require("../helper/logger");
+const { incrementFailedLogin } = require("../helper/failedLogin");
 
 const DATABASE_URL = process.env.DATABASE_URL;
+
+// function to display change password page
+router.get("/changePassword", (req, res) => {
+  console.log("Change Password Page");
+  res.render("changePassword", {
+    layout: "layouts/basicLayout",
+    title: "Change Password",
+  });
+});
+
+router.post("/changePassword", (req, res) => {
+  console.log("Change Password Page");
+  const { username, old_password, new_password, new_password_cfm } = req.body;
+  pool.query(
+    `SELECT * FROM users
+     JOIN usergroups ON users.usergroup= usergroups.group_name
+     WHERE username = $1`,
+    [username],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      if (results.rows.length == 0) {
+        res.status(400).send("Invalid username");
+        return;
+      }
+      const user = results.rows[0];
+      if (user) {
+        if (user.failed_login_count >= user.pin_max_tries) {
+          res.status(400).send("Account locked");
+          return;
+        }
+        if (bcrypt.compareSync(old_password, user.password)) {
+          if (new_password == new_password_cfm) {
+            bcrypt.hash(new_password, 10, (err, hash) => {
+              pool.query(
+                `UPDATE users SET password = $1 WHERE username = $2`,
+                [hash, username],
+                (error, results) => {
+                  if (error) {
+                    throw error;
+                  }
+                  res.status(200).send("Password changed");
+                }
+              );
+            });
+          } else {
+            res.status(400).send("New passwords do not match");
+          }
+        } else {
+          res.status(400).send("Invalid password");
+          incrementFailedLogin(user.username, user.failed_login_count, user.pin_max_tries);
+        }
+      }
+    }
+  );
+});
 
 router.get("/", (req, res) => {
   // Check postgres for the username
@@ -46,7 +105,8 @@ router.get("/:username", (req, res) => {
     join usergroups
     on users.company_id = usergroups.company_id
     and users.usergroup = usergroups.group_name
-    where username=$1 `,[username],
+    where username=$1 `,
+    [username],
     (error, results) => {
       if (error) {
         throw error;
@@ -107,11 +167,11 @@ router.post("/add", async (req, res) => {
             if (error) {
               console.log(error);
             }
-            console.log(results);
+            console.log(`Added ${results.rowCount} row(s) to users`);
           }
         );
         console.log("Adding");
-
+        logAction("Created User", user.username, "User: " + username);
         return res.redirect("/manageUsers");
       }
     }
@@ -148,11 +208,11 @@ router.post("/update", async (req, res) => {
       if (error) {
         console.log(error);
       }
-        res.redirect("/manageUsers");
-      console.log(results);
+      logAction("Updated User", user.username, "User: " + username);
+      res.redirect("/manageUsers");
+      console.log(`Updated ${results.rowCount} row(s) from users`);
     }
   );
-
 });
 
 // function to delete a user
@@ -189,12 +249,13 @@ router.delete("/delete", (req, res) => {
       if (error) {
         console.log(error);
       }
-      console.log(results);
+      console.log(`Deleted ${results.rowCount} row(s) from users`);
     }
   );
   console.log("Deleting");
 
   // return code 200 to indicate success
+  logAction("Deleted User", user.username, "User: " + username);
   return res.status(200).send("User deleted");
 });
 

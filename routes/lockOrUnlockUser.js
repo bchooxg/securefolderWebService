@@ -52,7 +52,7 @@ router.post("/", (req, res) => {
         connectionString: DATABASE_URL,
     });
     pool.query(
-        `UPDATE users SET is_locked = $1 where username = $2`,
+        `UPDATE users SET is_locked = $1, failed_login_count = 0 where username = $2`,
         [isLocked, username],
         (error, results) => {
             if (error) {
