@@ -46,6 +46,9 @@
             <button type="button" onclick="deleteUser('<%= user.username%>')" class="btn btn-danger">
               Delete
             </button>
+            <button type="button" onclick="changePasswordPrompt('<%= user.username%>')" class="btn btn-primary">
+              Change Password
+            </button>
             <% if(user.is_locked) { %>
               <button type="button" onclick="lockOrUnlockUser('<%= user.username%>', false)" class="btn btn-success">
                 Unlock User
@@ -141,6 +144,38 @@
   </div>
 </div>
 
+<!-- Modal to changepassword -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="passwordModalLAbel">Change User Password</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="passwordForm" action="/api/users/adminChangePassword" method="post">
+          <div class="mb-3">
+            <label for="cp_username" class="col-form-label">Username:</label>
+            <input readonly required name="cp_username" type="text" class="form-control" id="cp_username">
+          </div>
+          <div class="mb-3">
+            <label for="cp_password" class="col-form-label">New Password:</label>
+            <input required id="cp_password" name="cp_password" type="password" class="form-control" id="cp_password">
+          </div>
+
+          </div>
+        </form>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button form="passwordForm" type="submit" class="btn btn-primary">Change Password</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
 
 
@@ -189,6 +224,7 @@
     $('#last-name').val('');
     $('#user-group').val('default');
     $('#password').prop('disabled', false)
+    $('#password').prop('required', false)
     $('#userModal').modal('show');
   }
 
@@ -248,6 +284,11 @@
         alert(result.responseText);
       }
     });
+  }
+
+  function changePasswordPrompt(username){
+    $('#passwordModal').modal('show');
+    $('#cp_username').val(username);
   }
 
 </script>

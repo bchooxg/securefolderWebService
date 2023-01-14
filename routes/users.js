@@ -17,6 +17,31 @@ router.get("/changePassword", (req, res) => {
   });
 });
 
+router.post('/adminChangePassword', (req, res) => {
+  console.log("Admin Change Password POST request");
+
+  const { cp_username, cp_password } = req.body;
+  console.log(cp_username, cp_password)
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+  });
+
+  bcrypt.hash(cp_password, 10, (err, hash) => {
+    pool.query(
+      `UPDATE users SET password = $1 WHERE username = $2`,
+      [hash, cp_username],
+      (error, results) => {
+        if (error) {
+          throw error;
+        }
+        resetLoginAttempts(cp_username);
+        return res.redirect('/manageUsers');
+      }
+    );
+  });
+
+})
+
 router.post("/changePassword", (req, res) => {
   console.log("Change Password POST request");
   const { username, old_password, new_password, new_password_cfm } = req.body;
