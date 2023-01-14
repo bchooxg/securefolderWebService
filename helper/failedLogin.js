@@ -1,4 +1,5 @@
 const { Pool } = require("pg");
+const { logAction } = require("./logger");
 const DATABASE_URL = process.env.DATABASE_URL;
 
 function incrementFailedLogin(username, failedLoginCount, maxFailedLoginCount) {
@@ -32,6 +33,7 @@ function incrementFailedLogin(username, failedLoginCount, maxFailedLoginCount) {
         console.log(error);
       }
       console.log(results)
+      logAction("Failed Login", username)
       console.log(`Failed login count incremented for ${username}`);
     }
   );

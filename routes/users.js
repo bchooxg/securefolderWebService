@@ -34,6 +34,7 @@ router.post('/adminChangePassword', (req, res) => {
         if (error) {
           throw error;
         }
+        logAction(cp_username, "Change Password", "Changed by admin: " + req.user.username);
         resetLoginAttempts(cp_username);
         return res.redirect('/manageUsers');
       }
@@ -75,6 +76,7 @@ router.post("/changePassword", (req, res) => {
                     throw error;
                   }
                   resetLoginAttempts(username);
+                  logAction(cp_username, "Change Password");
                   res.status(200).send("Password changed");
                 }
               );
