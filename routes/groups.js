@@ -2,6 +2,7 @@ const express = require("express");
 const {Pool} = require("pg");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
+const { logAction } = require("../helper/logger");
 
 
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -26,6 +27,7 @@ router.post("/create", (req, res) => {
       if (error) {
         console.log(error);
       }
+      logAction("Created Group", user.username, "Group: " + group_name);
       console.log(results);
       res.redirect("/manageGroups");
     }
@@ -69,6 +71,7 @@ router.post("/update", (req, res) => {
         console.log(error);
       }
       console.log(results);
+      logAction("Updated Group", user.username, "Group: " + group_name);
       res.redirect("/manageGroups");
     }
   );
@@ -93,6 +96,7 @@ router.delete("/delete", (req, res) => {
         console.log(error);
       }
       console.log(results);
+      logAction("Deleted Group", user.username, "Group: " + group_name);
       return res.status(200).send("Group deleted");
     }
   );
