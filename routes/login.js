@@ -57,7 +57,6 @@ router.post("/", (req, res) => {
           if (fromApp) {
             return res.status(200).json(user);
           }
-          cons
           if(!user.is_admin){
               return res.status(401).send("User is not authorized to login to the web portal");
           }
