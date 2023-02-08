@@ -8,17 +8,10 @@ const { incrementFailedLogin, resetLoginAttempts } = require("../helper/failedLo
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
-// function to display change password page
-router.get("/changePassword", (req, res) => {
-  console.log("Change Password GET request");
-  res.render("changePassword", {
-    layout: "layouts/basicLayout",
-    title: "Change Password",
-  });
-});
-
 router.post('/adminChangePassword', (req, res) => {
   console.log("Admin Change Password POST request");
+  let user = jwt.verify(req.cookies.token, process.env.MY_SECRET);
+
 
   const { cp_username, cp_password } = req.body;
   console.log(cp_username, cp_password)
@@ -34,7 +27,7 @@ router.post('/adminChangePassword', (req, res) => {
         if (error) {
           throw error;
         }
-        logAction(cp_username, "Change Password", "Changed by admin: " + req.user.username);
+        logAction("Change Password", cp_username , "Changed by admin: " + user.username);
         resetLoginAttempts(cp_username);
         return res.redirect('/manageUsers');
       }
@@ -75,8 +68,9 @@ router.post("/changePassword", (req, res) => {
                   if (error) {
                     throw error;
                   }
+                  console.log("Password changed for " + username)
                   resetLoginAttempts(username);
-                  logAction(cp_username, "Change Password");
+                  logAction("Change Password", username);
                   res.status(200).send("Password changed");
                 }
               );

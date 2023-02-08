@@ -47,6 +47,15 @@ router.get("/home", cookieJwtAuth, (req, res) => {
 
 });
 
+// function to display change password page
+router.get("/changePassword", (req, res) => {
+  console.log("Change Password GET request");
+  res.render("changePassword", {
+    layout: "layouts/basicLayout",
+    title: "Change Password",
+  });
+});
+
 router.get("/manageUsers", cookieJwtAuth, (req, res) => {
   let token = req.cookies.token;
   let user = jwt.verify(token, process.env.MY_SECRET);
