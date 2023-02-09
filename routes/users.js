@@ -87,56 +87,57 @@ router.post("/changePassword", (req, res) => {
   );
 });
 
-router.get("/", (req, res) => {
-  // Check postgres for the username
-  const pool = new Pool({
-    connectionString: DATABASE_URL,
-  });
+// Hiding this route as not in use
+// router.get("/", (req, res) => {
+//   // Check postgres for the username
+//   const pool = new Pool({
+//     connectionString: DATABASE_URL,
+//   });
 
-  pool.query("SELECT * FROM users ORDER BY id ASC", (error, results) => {
-    if (error) {
-      console.log(error);
-    }
-    console.log(results);
-    res.status(200).json(results.rows);
-  });
-});
+//   pool.query("SELECT * FROM users ORDER BY id ASC", (error, results) => {
+//     if (error) {
+//       console.log(error);
+//     }
+//     console.log(results);
+//     res.status(200).json(results.rows);
+//   });
+// });
 
-router.get("/:username", (req, res) => {
-  // Sanitize the input
-  let username = req.params.username.replace(/[^a-zA-Z0-9]/g, "");
-  // remove sql injection commands
-  username = req.params.username.replace(
-    /(select|drop|delete|update|insert|where|from|limit|order|by|group|having|truncate|alter|grant|create|desc|asc|union|into|load_file|outfile)/gi,
-    ""
-  );
+// router.get("/:username", (req, res) => {
+//   // Sanitize the input
+//   let username = req.params.username.replace(/[^a-zA-Z0-9]/g, "");
+//   // remove sql injection commands
+//   username = req.params.username.replace(
+//     /(select|drop|delete|update|insert|where|from|limit|order|by|group|having|truncate|alter|grant|create|desc|asc|union|into|load_file|outfile)/gi,
+//     ""
+//   );
 
-  if (username.length == 0) {
-    res.status(400).send("Invalid username");
-    return;
-  }
+//   if (username.length == 0) {
+//     res.status(400).send("Invalid username");
+//     return;
+//   }
 
-  // Check postgres for the username
-  const pool = new Pool({
-    // connectionString: process.env.DATABASE_URL,
-    connectionString: DATABASE_URL,
-  });
+//   // Check postgres for the username
+//   const pool = new Pool({
+//     // connectionString: process.env.DATABASE_URL,
+//     connectionString: DATABASE_URL,
+//   });
 
-  pool.query(
-    `SELECT * FROM users
-    join usergroups
-    on users.company_id = usergroups.company_id
-    and users.usergroup = usergroups.group_name
-    where username=$1 `,
-    [username],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      res.status(200).json(results.rows[0]);
-    }
-  );
-});
+//   pool.query(
+//     `SELECT * FROM users
+//     join usergroups
+//     on users.company_id = usergroups.company_id
+//     and users.usergroup = usergroups.group_name
+//     where username=$1 `,
+//     [username],
+//     (error, results) => {
+//       if (error) {
+//         throw error;
+//       }
+//       res.status(200).json(results.rows[0]);
+//     }
+//   );
+// });
 
 // Function to add a new user
 router.post("/add", async (req, res) => {
