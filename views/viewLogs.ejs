@@ -15,20 +15,20 @@
     <table id="logsTable" class="display">
       <thead>
         <tr>
+          <th>Timestamp</th>
           <th>Username</th>
           <th>Action</th>
           <th>File Name</th>
-          <th>Timestamp</th>
           <th>Remarks</th>
         </tr>
       </thead>
       <tbody>
         <% logs.forEach(function(log) { %>
         <tr>
+          <td><%= log.timestamp %></td>
           <td><%= log.username %></td>
           <td><%= log.action %></td>
           <td><%= log.filename %></td>
-          <td><%= log.timestamp %></td>
           <td><%= log.remarks %></td>
         </tr>
         <% }); %>
