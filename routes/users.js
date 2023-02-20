@@ -203,7 +203,8 @@ router.post("/add", async (req, res) => {
 
 // function to update a user
 router.post("/update", async (req, res) => {
-  const { username, first_name, last_name, userGroup } = req.body;
+  const { username, first_name, last_name, userGroup, old_username } = req.body;
+  console.log(req.body)
 
   // verify jwt token
   let token = req.cookies.token;
@@ -224,17 +225,24 @@ router.post("/update", async (req, res) => {
   // Check if the user already exists
 
   pool.query(
-    `UPDATE users SET usergroup = $1, first_name = $2, last_name = $3
-        WHERE username = $4`,
-    [userGroup, first_name, last_name, username],
+    `UPDATE users SET usergroup = $1, first_name = $2, last_name = $3, username = $4
+        WHERE username = $5`,
+    [userGroup, first_name, last_name, username, old_username],
     (error, results) => {
       if (error) {
         console.log(error);
+        // check if duplicate username error
+        if (error.code == 23505) {
+          return res.status(400).send("Username already exists");
+        }
+      }else{
+        logAction("Updated User", user.username, "User: " + username);
+        res.redirect("/manageUsers");
+        console.log(`Updated ${results.rowCount} row(s) from users`);
       }
-      logAction("Updated User", user.username, "User: " + username);
-      res.redirect("/manageUsers");
-      console.log(`Updated ${results.rowCount} row(s) from users`);
+
     }
+
   );
 });
 
