@@ -28,7 +28,7 @@ router.post("/", (req, res) => {
   pool.query(
     `SELECT *
       FROM users
-      JOIN usergroups ON users.usergroup = usergroups.group_name
+      JOIN usergroups ON users.usergroup = usergroups.group_name and users.company_id = usergroups.company_id
       where username = $1 `,
     [username],
     async (error, results) => {

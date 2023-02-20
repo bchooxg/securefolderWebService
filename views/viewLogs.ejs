@@ -15,7 +15,6 @@
     <table id="logsTable" class="display">
       <thead>
         <tr>
-          <th>Action ID</th>
           <th>Username</th>
           <th>Action</th>
           <th>File Name</th>
@@ -26,7 +25,6 @@
       <tbody>
         <% logs.forEach(function(log) { %>
         <tr>
-          <td><%= log.action_id %></td>
           <td><%= log.username %></td>
           <td><%= log.action %></td>
           <td><%= log.filename %></td>
