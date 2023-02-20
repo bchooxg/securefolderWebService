@@ -103,6 +103,7 @@
       </div>
       <div class="modal-body">
         <form id="userForm" action="api/users/add" method="post">
+          <input type="hidden" name="old_username" id="old_username">
           <div class="mb-3">
             <label for="username" class="col-form-label">Username:</label>
             <input required name="username" type="text" class="form-control" id="username">
@@ -218,6 +219,8 @@
   function addUserModal() {
     $('#userModalLabel').text('Add User');
     $('#userForm').attr('action', '/api/users/add');
+    $('#old_username').prop('disabled', true)
+    $('#old_username').val('');
     $('#username').val('');
     $('#username').prop('disabled', false)
     $('#first-name').val('');
@@ -241,7 +244,9 @@
     $('#password').prop('disabled', true)
     $('#password').prop('required', false)
     $('#username').val(result[0]);
-    $('#username').prop('disabled', true)
+    $('#old_username').val(result[0]);
+    $('#old_username').prop('disabled', false)
+    $('#username').prop('disabled', false)
     $('#first-name').val(result[1]);
     $('#last-name').val(result[2]);
     $('#user-group').val(result[3]);
