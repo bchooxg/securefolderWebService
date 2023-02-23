@@ -21,7 +21,7 @@
           <th>Require Biometrics</th>
           <th>Require Encryption</th>
           <th>Pin Max Tries</th>
-          <th>Pin Type</th>
+          <!-- <th>Pin Type</th> -->
           <th>Is Admin</th>
           <th>Actions</th>
         </tr>
@@ -34,7 +34,7 @@
           <td><%= group.require_biometrics %></td>
           <td><%= group.require_encryption %></td>
           <td><%= group.pin_max_tries %></td>
-          <td><%= group.pin_type %></td>
+          <!-- <td><%= group.pin_type %></td> -->
           <td><%= group.is_admin %></td>
           <td>
             <button class="btn btn-primary" onclick="editGroup('<%= group.group_name%>')">Edit</button>
@@ -90,14 +90,14 @@
             <label for="pin_max_tries" class="col-form-label">Pin Max Tries:</label>
             <input required name="pin_max_tries" type="number" class="form-control" id="pin_max_tries">
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="pin_type" class="col-form-label">Pin Type:</label>
             <select required name='pin_type' class="form-select" id="pin_type" aria-label="Default select example">
               <option value="pin">Numeric</option>
               <option value="pass">Alpha-Numeric</option>
             </select>
 
-          </div>
+          </div> -->
         </form>
       </div>
       <div class="modal-footer">
@@ -127,7 +127,7 @@
     $('#cb_require_encryption').prop('checked', false);
     $('#cb_is_admin').prop('checked', false);
     $('#pin_max_tries').val("");
-    $('#pin_type').val("pin");
+    //$('#pin_type').val("pin");
     // Set the form action
     $('#groupForm').attr('action', 'api/groups/create');
     $('#groupModal').modal('show');
@@ -146,8 +146,8 @@
     $('#cb_require_biometrics').prop('checked',  result[2] == 'true');
     $('#cb_require_encryption').prop('checked', result[3] == 'true');
     $('#pin_max_tries').val(result[4]);
-    $('#pin_type').val(result[5]);
-    $('#cb_is_admin').prop('checked', result[6] == 'true')
+    //$('#pin_type').val(result[5]);
+    $('#cb_is_admin').prop('checked', result[5] == 'true')
     // Set the form action
     $('#groupForm').attr('action', '/api/groups/update');
     // Show the modal
