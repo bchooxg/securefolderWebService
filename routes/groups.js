@@ -11,7 +11,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 router.post("/create", (req, res) => {
   let token = req.cookies.token;
   let user = jwt.verify(token, process.env.MY_SECRET);
-  let { group_name, min_pass, require_biometrics , require_encryption, pin_max_tries, pin_type } = req.body;
+  let { group_name, min_pass, require_biometrics , require_encryption, pin_max_tries, is_admin } = req.body;
   console.log(req.body);
   require_biometrics = require_biometrics === "true" ? true : false;
   require_encryption = require_encryption === "true" ? true : false;
@@ -20,9 +20,9 @@ router.post("/create", (req, res) => {
     connectionString: DATABASE_URL,
   });
   pool.query(
-    `INSERT INTO usergroups (group_name, min_pass, require_biometrics, require_encryption, pin_max_tries, pin_type, company_id)
+    `INSERT INTO usergroups (group_name, min_pass, require_biometrics, require_encryption, pin_max_tries, is_admin, company_id)
     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [group_name, min_pass, require_biometrics, require_encryption, pin_max_tries, pin_type, company_id],
+    [group_name, min_pass, require_biometrics, require_encryption, pin_max_tries, is_admin, company_id],
     (error, results) => {
       if (error) {
         console.log(error);
