@@ -14,6 +14,7 @@ router.post("/create", (req, res) => {
   let { group_name, min_pass, require_biometrics , require_encryption, pin_max_tries, is_admin } = req.body;
   console.log(req.body);
   require_biometrics = require_biometrics === "true" ? true : false;
+  is_admin = is_admin === "true" ? true : false;
   require_encryption = require_encryption === "true" ? true : false;
   const company_id = user.company_id;
   const pool = new Pool({
